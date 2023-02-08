@@ -1,0 +1,191 @@
+import "package:flutter/material.dart";
+import 'package:flutter/services.dart';
+import '../model/ToDo.dart';
+import '../constants/colors.dart';
+import '../widgets/toDo_items.dart';
+
+class Notes extends StatefulWidget {
+  const Notes({super.key});
+
+  @override
+  State<Notes> createState() => _NotesState();
+}
+
+class _NotesState extends State<Notes> {
+  @override
+  Widget build(BuildContext context) {
+    return Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Color.fromARGB(0, 255, 193, 7)));
+    return Scaffold(
+      backgroundColor: tdBGColor,
+      appBar: _buildAppBar(),
+      body: Stack(
+         primary: false,
+          padding: const EdgeInsets.all(16),
+          crossAxisSpacing: 10,
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+        children: [
+          Container(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              child: Column(
+                children: [
+                  searchBox(),
+                  Expanded(
+                    child: GridView.count(
+      
+          padding: const EdgeInsets.all(16),
+          crossAxisSpacing: 10,
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: 50, bottom: 20),
+                          child: Text(
+                            "NOTES",
+                            style: TextStyle(
+                                fontSize: 30, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        for (ToDo todoo in _foundToDo.reversed)
+                          ToDoItems(
+                            todo: todoo,
+                            onTodoChanged: _handleToDoChange,
+                            onDelete: _deleteToDoItem,
+                          ),
+                      ],
+                    ),
+                  )
+                ],
+              )),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Row(children: [
+              Expanded(
+                  child: Container(
+                margin: EdgeInsets.only(
+                  bottom: 20,
+                  right: 20,
+                  left: 20,
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0.0, 0.0),
+                          blurRadius: 10.0,
+                          spreadRadius: 0.0),
+                    ],
+                    borderRadius: BorderRadius.circular(10)),
+                child: TextField(
+                  controller: _todoController,
+                  decoration: InputDecoration(
+                      hintText: 'Add a new ToDo item',
+                      border: InputBorder.none),
+                ),
+              )),
+              Container(
+                  margin: EdgeInsets.only(bottom: 20, right: 20),
+                  child: SizedBox(
+                    height: 60,
+                    width: 53,
+                    child: ElevatedButton(
+                      child: Text(
+                        '+',
+                        style: TextStyle(fontSize: 40),
+                      ),
+                      onPressed: () {
+                        _addToDoItem(_todoController.text);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: tdBlue,
+                        elevation: 10,
+                      ),
+                    ),
+                  ))
+            ]),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _handleToDoChange(ToDo todo) {
+    setState(() {
+      todo.isDone = !todo.isDone;
+    });
+  }
+
+  void _deleteToDoItem(String id) {
+    setState(() {
+      todoList.removeWhere((item) => item.id == id);
+    });
+  }
+
+  void _addToDoItem(String toDo) {
+    setState(() {
+      todoList.add(ToDo(
+          id: DateTime.now().microsecondsSinceEpoch.toString(),
+          todoText: toDo));
+    });
+    _todoController.clear();
+  }
+
+  void _runFilter(String enteredKeyboard) {
+    List<ToDo> result = [];
+    if (enteredKeyboard.isEmpty) {
+      result = todoList;
+    } else {
+      result = todoList
+          .where((item) => item.todoText!
+              .toLowerCase()
+              .contains(enteredKeyboard.toLowerCase()))
+          .toList();
+    }
+    setState(() {
+      _foundToDo = result;
+    });
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      centerTitle: true,
+      backgroundColor: tdBlue,
+      title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text("ToDo_App"),
+        SizedBox(
+          width: 5,
+        ),
+        Icon(
+          Icons.check_box,
+          color: Colors.white,
+          size: 30,
+        ),
+      ]),
+    );
+  }
+
+  Widget searchBox() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(20)),
+      child: TextField(
+          onChanged: (value) => _runFilter(value),
+          decoration: InputDecoration(
+              contentPadding: EdgeInsets.all(0),
+              prefixIcon: Icon(Icons.search),
+              prefixIconConstraints:
+                  BoxConstraints(maxHeight: 20, maxWidth: 25),
+              border: InputBorder.none,
+              hintText: 'Search',
+              hintStyle: TextStyle(color: tdGrey))),
+    );
+  }
+}  }

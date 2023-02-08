@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:todo/dashboard.dart';
 import 'package:todo/screens/home.dart';
 
 void main() {
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ToDo App',
-      home: Home(),
+      home: dashboard(),
     );
   }
 }
